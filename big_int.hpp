@@ -31,13 +31,11 @@ class BigInt : public Number {
   // Inserción / Extracción
 
   // BORRAR LOS DOS MÉTODOS E IMPLEMENTAR SU CÓDIGO EN EL READ/WRITE
-  /*
   template <size_t Bass>
   friend std::ostream& operator<<(std::ostream&, const BigInt<Bass>&);
   template <size_t Bass>
   friend std::istream& operator>>(std::istream&, BigInt<Bass>&);
-  */
-  ////////
+
   // Operadores de comparación
   template <size_t Bass>
   friend bool operator==(const BigInt<Bass>& numero1,
@@ -256,7 +254,6 @@ char BigInt<Base>::operator[](int posicion) const {
 
 // ============= SOBRECARGA DE OPERADORES DE INSERCIÓN/EXTRACCIÓN =============
 
-/*
 template <size_t Base>
 std::ostream& operator<<(std::ostream& os, const BigInt<Base>& numero) {
   for (unsigned long i{numero.numero_.size() - 1}; i != -1; --i) {
@@ -282,10 +279,10 @@ std::istream& operator>>(std::istream& is, BigInt<Base>& big_int) {
                     // por el que queramos
   big_int.numero_.clear();  // Borramos el contenido del BigInt para
                             // introducirle el nuevo valor
-  big_int.numero_ = aux.numero_;
+  big_int = aux;
   return is;
 }
-*/
+
 // =============== SOBRECARGA DE OPERADOR '=' ===============
 
 template <size_t Base>
@@ -770,13 +767,10 @@ BigInt<Base>::operator BigInt<2ULL>() const {
 }
 */
 
-// TERMINARRRRRRRRR
 template <size_t Base>
 BigInt<Base>::operator BigInt<8UL>() const {
   BigInt<Base> aux_numero{*this}, ocho{8};
-  if (Base == 2) {
-    return BigInt<8>{*this};  // Usando conversor especialización
-  } else if (Base == 10) {
+  if (Base == 10) {
     // Hacer por residuos dividiendo entre 8
     std::string numero, residuos;
     BigInt<Base> aux{*this};
@@ -799,28 +793,84 @@ BigInt<Base>::operator BigInt<8UL>() const {
     BigInt<8> resultado{residuos};
     return resultado;
   } else if (Base == 16) {
-    // 1. Pasar a binario, haciendo residuos dividiendo entre 2
-    std::string numero, residuos;
+    // 1. Pasar a binario, si lo hicieramos a papel miraríamos cada dígito a
+    // hexadecimal y lo sustituiriamos por su equivalente en binario, en este
+    // caso con 4 bits, y lo iríamos añadiendo al final de el número para
+    // después pasarlo a octal
     BigInt<Base> aux{*this};
-    for (unsigned long i{aux.numero_.size() - 1}; i != -1; --i) {
-      if (aux.numero_[i] >= 10) {
-        numero.push_back(static_cast<char>('A' + numero_[i] - 10));
-      } else {
-        numero.push_back((static_cast<char>(numero_[i] + '0')));
+    std::string resultado{""}; // auxiliar que nos permite ir guardando el número en binario
+    for (unsigned long i{aux.numero_.size() - 1}; i != -1; --i) { // For a la inversa por que el número está al revés
+      switch (aux.numero_[i]) {
+        case 1: {
+          resultado += {"0001"};
+          break;
+        }
+        case 2: {
+          resultado += {"0010"};
+          break;
+        }
+        case 3: {
+          resultado += {"0011"};
+          break;
+        }
+        case 4: {
+          resultado += {"0100"};
+          break;
+        }
+        case 5: {
+          resultado += {"0101"};
+          break;
+        }
+        case 6: {
+          resultado += {"0110"};
+          break;
+        }
+        case 7: {
+          resultado += {"0111"};
+          break;
+        }
+        case 8: {
+          resultado += {"0100"};
+          break;
+        }
+        case 9: {
+          resultado += {"0101"};
+          break;
+        }
+        case 10: {
+          resultado += {"1010"};
+          break;
+        }
+        case 11: {
+          resultado += {"1011"};
+          break;
+        }
+        case 12: {
+          resultado += {"1100"};
+          break;
+        }
+        case 13: {
+          resultado += {"1101"};
+          break;
+        }
+        case 14: {
+          resultado += {"1110"};
+          break;
+        }
+        case 15: {
+          resultado += {"1111"};
+          break;
+        }
+        default: {
+          resultado += {"00000"};
+          break;
+        }
       }
     }
-    long long aux_numero{std::stoll(numero)};
-    int resto;
-    while (aux_numero >= 2) {
-      resto = aux_numero % 2;
-      residuos.push_back(static_cast<char>(resto + '0'));
-      aux_numero /= 2;
-    }
-    residuos.push_back(static_cast<char>(aux_numero + '0'));
-    std::reverse(residuos.begin(), residuos.end());
-    BigInt<2> resultado{residuos};
+    BigInt<2> resultado_binario{resultado}; // Declaramos un BigInt<2> para poder hacer la conversión
     // 2. Pasar de binario a octal
-    
+    BigInt<8> resultado_final{resultado_binario}; // Usamos el conversor de la especialización
+    return resultado_final;
   }
   // Caso pasar de octal a octal
   return *this;  // Si se pasa de octal a octal el número se queda igual
@@ -976,7 +1026,6 @@ int BigInt<2>::sign() const {
 }
 // ============= SOBRECARGA DE OPERADORES DE INSERCIÓN/EXTRACCIÓN =============
 
-/*
 std::istream& operator>>(std::istream& is, BigInt<2>& numero) {
   // Este operador funciona asumiendo que el número que te van a introducir es
   // en binario
@@ -994,7 +1043,6 @@ std::ostream& operator<<(std::ostream& os, const BigInt<2>& numero) {
   }
   return os;
 }
-*/
 
 // =============== SOBRECARGA DE OPERADOR '=' ===============
 
@@ -1355,7 +1403,13 @@ Number* BigInt<2>::module(const Number* n) const { return nullptr; }
 
 Number* BigInt<2>::pow(const Number* n) const { return nullptr; }
 
-std::ostream& BigInt<2>::write(std::ostream& os) const { return os; }
+std::ostream& BigInt<2>::write(std::ostream& os) const {
+  BigInt<2> numero{*this};
+  for (unsigned long i{numero.numero_.size() - 1}; i != -1; --i) {
+    os << numero.numero_[i];
+  }
+  return os;
+}
 
 std::istream& BigInt<2>::read(std::istream& is) {
   std::string aux_numero;
