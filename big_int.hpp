@@ -679,33 +679,33 @@ BigInt<Base> BigInt<Base>::operator--(int) {  // Post-decremento
 
 // Métodos de la clase Number
 template <size_t Base>
-Number* BigInt<Base>::add(const Number* n) const {
-  return nullptr;
+Number* BigInt<Base>::add(const Number* numero) const {
+  return *this + numero;
 }
 
 template <size_t Base>
-Number* BigInt<Base>::subtract(const Number* n) const {
-  return nullptr;
+Number* BigInt<Base>::subtract(const Number* numero) const {
+  return *this - numero;
 }
 
 template <size_t Base>
-Number* BigInt<Base>::multiply(const Number* n) const {
-  return nullptr;
+Number* BigInt<Base>::multiply(const Number* numero) const {
+  return *this * numero;
 }
 
 template <size_t Base>
-Number* BigInt<Base>::divide(const Number* n) const {
-  return nullptr;
+Number* BigInt<Base>::divide(const Number* numero) const {
+  return *this / numero;
 }
 
 template <size_t Base>
-Number* BigInt<Base>::module(const Number* n) const {
-  return nullptr;
+Number* BigInt<Base>::module(const Number* numero) const {
+  return *this % numero;
 }
 
 template <size_t Base>
-Number* BigInt<Base>::pow(const Number* n) const {
-  return nullptr;
+Number* BigInt<Base>::pow(const Number* numero) const {
+  return pow(*this, numero);
 }
 
 template <size_t Base>
@@ -769,6 +769,7 @@ BigInt<Base>::operator BigInt<2ULL>() const {
 
 template <size_t Base>
 BigInt<Base>::operator BigInt<8UL>() const {
+  // Omitimos la base 2, por que el conversor de tipo está hecho en la especialización
   BigInt<Base> aux_numero{*this}, ocho{8};
   if (Base == 10) {
     // Hacer por residuos dividiendo entre 8
@@ -793,13 +794,15 @@ BigInt<Base>::operator BigInt<8UL>() const {
     BigInt<8> resultado{residuos};
     return resultado;
   } else if (Base == 16) {
-    // 1. Pasar a binario, si lo hicieramos a papel miraríamos cada dígito a
-    // hexadecimal y lo sustituiriamos por su equivalente en binario, en este
-    // caso con 4 bits, y lo iríamos añadiendo al final de el número para
-    // después pasarlo a octal
+    // 1. Pasar de hexadecimal a binario, si lo hicieramos a papel miraríamos
+    // cada dígito a hexadecimal y lo sustituiriamos por su equivalente en
+    // binario, en este caso con 4 bits, y lo iríamos añadiendo al final de el
+    // número para después pasarlo a octal
     BigInt<Base> aux{*this};
-    std::string resultado{""}; // auxiliar que nos permite ir guardando el número en binario
-    for (unsigned long i{aux.numero_.size() - 1}; i != -1; --i) { // For a la inversa por que el número está al revés
+    std::string resultado{
+        ""};  // auxiliar que nos permite ir guardando el número en binario
+    for (unsigned long i{aux.numero_.size() - 1}; i != -1;
+         --i) {  // For a la inversa por que el número está al revés
       switch (aux.numero_[i]) {
         case 1: {
           resultado += {"0001"};
@@ -867,9 +870,11 @@ BigInt<Base>::operator BigInt<8UL>() const {
         }
       }
     }
-    BigInt<2> resultado_binario{resultado}; // Declaramos un BigInt<2> para poder hacer la conversión
+    BigInt<2> resultado_binario{
+        resultado};  // Declaramos un BigInt<2> para poder hacer la conversión
     // 2. Pasar de binario a octal
-    BigInt<8> resultado_final{resultado_binario}; // Usamos el conversor de la especialización
+    BigInt<8> resultado_final{
+        resultado_binario};  // Usamos el conversor de la especialización
     return resultado_final;
   }
   // Caso pasar de octal a octal
@@ -878,12 +883,124 @@ BigInt<Base>::operator BigInt<8UL>() const {
 
 template <size_t Base>
 BigInt<Base>::operator BigInt<10UL>() const {
-  return BigInt<10>{};
+  // Omitimos la base 2, por que el conversor de tipo está hecho en la especialización
+  if (Base == 8) {
+    BigInt<Base> aux{*this};
+    long long resultado{0};
+    for (unsigned long i{0}; i < aux.numero_.size(); ++i) {
+      resultado += (aux.numero_[i] * std::pow(8, i));
+    }
+    return BigInt<10> {resultado};
+  } else if (Base == 16) {
+    BigInt<Base> aux{*this};
+    long long resultado{0};
+    for (unsigned long i{0}; i < aux.numero_.size(); ++i) {
+      resultado += (aux.numero_[i] * std::pow(16, i));
+    }
+    return BigInt<10> {resultado};
+  }
+  return *this;
 }
 
 template <size_t Base>
 BigInt<Base>::operator BigInt<16UL>() const {
-  return BigInt<16>{};
+  // Omitimos la base 2, por que el conversor de tipo está hecho en la especialización
+  if (Base == 8) {
+    // Primero pasamos de octal a binario sustituyendo el valor en octal por su equivalente en binario
+    BigInt<Base> aux{*this};
+    std::string resultado{""};  // auxiliar que nos permite ir guardando el número en binario
+    for (unsigned long i{aux.numero_.size() - 1}; i != -1; --i) {
+      switch (aux.numero_[i]) {
+        case 1: {
+          resultado += {"001"};
+          break;
+        }
+        case 2: {
+          resultado += {"010"};
+          break;
+        }
+        case 3: {
+          resultado += {"011"};
+          break;
+        }
+        case 4: {
+          resultado += {"100"};
+          break;
+        }
+        case 5: {
+          resultado += {"101"};
+          break;
+        }
+        case 6: {
+          resultado += {"110"};
+          break;
+        }
+        case 7: {
+            resultado += {"111"};
+          break;
+        } 
+        default: {
+          resultado += {"000"};
+          break;
+        }
+      }
+    }
+    BigInt<2> resultado_binario{resultado};
+    // Pasamos de binario a hexadecimal con el conversor de la especialización
+    return BigInt<16>{resultado_binario};
+  } else if (Base == 10) {
+    // Pasamos de decimal a hexadecimal por el método de los residuos:
+    std::string numero, residuos;
+    BigInt<Base> aux{*this};
+    for (unsigned long i{aux.numero_.size() - 1}; i != -1; --i) {
+      if (aux.numero_[i] >= 10) {
+        numero.push_back(static_cast<char>('A' + numero_[i] - 10));
+      } else {
+        numero.push_back((static_cast<char>(numero_[i] + '0')));
+      }
+    }
+    long long aux_numero{std::stoll(numero)};
+    int resto;
+    while (aux_numero >= 16) {
+      resto = aux_numero % 16;
+      switch (resto) {
+        case 10: {
+          residuos.push_back('A');
+          break;
+        }
+        case 11: {
+          residuos.push_back('B');
+          break;
+        }
+        case 12: {
+          residuos.push_back('C');
+          break;
+        }
+        case 13: {
+          residuos.push_back('D');
+          break;
+        }
+        case 14: {
+          residuos.push_back('E');
+          break;
+        }
+        case 15: {
+          residuos.push_back('F');
+          break;
+        }
+        default: {
+          residuos.push_back(static_cast<char>(resto + '0'));
+          break;
+        }
+      }
+      aux_numero /= 16;
+    }
+    residuos.push_back(static_cast<char>(aux_numero + '0'));
+    std::reverse(residuos.begin(), residuos.end());
+    return BigInt<16> {residuos};
+  }
+  // Caso pasar de hexadecimal a hexadecimal
+  return *this;
 }
 
 // ====== ESPECIALIZACIÓN CLASE BigInt PARA NÚMEROS BINARIOS ======
@@ -1391,17 +1508,17 @@ BigInt<2>::operator BigInt<16UL>() const {
 }
 
 // Métodos de la clase Number
-Number* BigInt<2>::add(const Number* n) const { return nullptr; }
+Number* BigInt<2>::add(const Number* numero) const { return *this + numero; }
 
-Number* BigInt<2>::subtract(const Number* n) const { return nullptr; }
+Number* BigInt<2>::subtract(const Number* numero) const { return *this - numero; }
 
-Number* BigInt<2>::multiply(const Number* n) const { return nullptr; }
+Number* BigInt<2>::multiply(const Number* numero) const { return *this * numero; }
 
-Number* BigInt<2>::divide(const Number* n) const { return nullptr; }
+Number* BigInt<2>::divide(const Number* numero) const { return *this / numero; }
 
-Number* BigInt<2>::module(const Number* n) const { return nullptr; }
+Number* BigInt<2>::module(const Number* numero) const { return *this % numero; }
 
-Number* BigInt<2>::pow(const Number* n) const { return nullptr; }
+Number* BigInt<2>::pow(const Number* numero) const { return pow(*this, numero); }
 
 std::ostream& BigInt<2>::write(std::ostream& os) const {
   BigInt<2> numero{*this};
