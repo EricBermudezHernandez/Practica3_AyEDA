@@ -6,24 +6,17 @@
 // Clase para manejar la presencia de un dígito no válido en la cadena de inicialización de un objeto BigInt<Base>.
 class BigIntBadDigit : public BigIntException {
  public:
-  BigIntBadDigit() : BigIntException() {}
-  // ????
+  BigIntBadDigit(const std::string& mensaje) : BigIntException(mensaje) {}
 };
 
 class BigIntDivisionByZero : public BigIntException {
  public:
-  BigIntDivisionByZero() : BigIntException() {}
+  BigIntDivisionByZero(const std::string& mensaje) : BigIntException(mensaje) {}
 };
 
 class BigIntBaseNotImplemented : public BigIntException {
  public: 
-  BigIntBaseNotImplemented(size_t base) : BigIntException() {
-    base_ = base;
-  }
-
-  // Hacer método para que el usuario haga algo con la base
- private:
-  size_t base_;
+  BigIntBaseNotImplemented(const std::string& mensaje) : BigIntException(mensaje) {}
 };
 
 #endif
