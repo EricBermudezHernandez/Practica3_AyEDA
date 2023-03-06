@@ -77,7 +77,7 @@ class BigInt : public Number {
   Number* pow(const Number*) const;
 
   // Operadores para cambiar a otras bases:
-  // operator BigInt<2>() const;
+  operator BigInt<2>() const;
   operator BigInt<8>() const;
   operator BigInt<10>() const;
   operator BigInt<16>() const;
@@ -572,8 +572,7 @@ BigInt<Base> operator/(const BigInt<Base>& numero1,
   // es "numero2", es 0. Una división por 0 no es posible, por lo que lo
   // indicamos y salimos del programa
   if (numero2.numero_.size() == 1 && numero2.numero_[0] == 0) {
-    std::cout << "No es posible realizar una división por 0" << std::endl;
-    exit(1);
+    throw("No es posible realizar una división por 0\n");
   }
 
   // Verificar si el dividendo(numero1) es menor que el divisor(numero2), si
@@ -738,7 +737,7 @@ std::istream& BigInt<Base>::read(std::istream& is) {
 }
 
 // Operadores de cambio de tipo:
-/*
+
 template <size_t Base>
 BigInt<Base>::operator BigInt<2ULL>() const {
   std::string numero, residuos;
@@ -765,7 +764,6 @@ BigInt<Base>::operator BigInt<2ULL>() const {
   BigInt<2> resultado{residuos};
   return resultado;
 }
-*/
 
 template <size_t Base>
 BigInt<Base>::operator BigInt<8UL>() const {
@@ -1058,7 +1056,7 @@ class BigInt<2> : public Number {
   Number* pow(const Number*) const;
 
   // Conversores de binario a otras bases:
-  // operator BigInt<2>() const;
+  operator BigInt<2>() const;
   operator BigInt<8>() const;
   operator BigInt<10>() const;
   operator BigInt<16>() const;
@@ -1321,8 +1319,7 @@ BigInt<2> operator/(const BigInt<2>& numero1, const BigInt<2>& divisor) {
   // es "numero2", es 0. Una división por 0 no es posible, por lo que lo
   // indicamos y salimos del programa
   if (divisor.numero_.size() == 1 && divisor.numero_[0] == 0) {
-    std::cout << "No es posible realizar una división por 0" << std::endl;
-    exit(1);
+    throw("No es posible realizar una división por 0\n");
   }
 
   // Verificar si el dividendo(numero1) es menor que el divisor(numero2), si
@@ -1413,11 +1410,9 @@ BigInt<2> BigInt<2>::operator--(int) {  // Post-decremento
 }
 
 // =============== CONVERSORES DE BINARIO A OTRAS BASES ===============
-/*
 BigInt<2>::operator BigInt<2ULL>() const {
   return *this;
 }
-*/
 BigInt<2>::operator BigInt<8UL>() const {
   BigInt<2> aux{*this};
   std::string numero_convertido_aux{""};
