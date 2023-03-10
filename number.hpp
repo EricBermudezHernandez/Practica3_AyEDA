@@ -1,6 +1,5 @@
 #ifndef NUMBER_H
 #define NUMBER_H
-#include "big_int.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -13,9 +12,6 @@
 
 template <size_t Base>
 class BigInt;
-
-template <>
-class BigInt<2>;
 
 class Number {
  public:
@@ -41,40 +37,8 @@ class Number {
   virtual std::istream& read(std::istream&) = 0;
   friend std::ostream& operator<<(std::ostream& os, const Number& n);
   friend std::istream& operator>>(std::istream&, Number&);
+  // Método para obtener la base de un BigInt y poder hacer las operaciones de manera más sencilla
+  virtual int GetBase() const = 0;
 };
-
-std::ostream& operator<<(std::ostream& os, const Number& numero) {
-    return numero.write(os);
-}
-
-std::istream& operator>>(std::istream& is, Number& numero) {
-  return numero.read(is);
-}
-
-Number* Number::create(size_t base, const std::string& s) {
-  switch (base) {
-  case 2: {
-    std::string aux{s};
-    return new BigInt<2>{aux};
-    break;
-  }
-    /*
-  case 8:
-    return new BigInt<8>{s};
-    break;  
-
-  case 10:
-    return new BigInt<10>{s};
-    break;
-  
-  case 16:
-    return new BigInt<16>{s};
-    break;
-  */
-  default:
-    throw("La base no está implementada");
-    break;
-  }
-}
 
 #endif
