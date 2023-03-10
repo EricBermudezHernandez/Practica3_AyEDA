@@ -1,5 +1,6 @@
 #include "big_int.hpp"
 #include "board.hpp"
+#include "bigint_exceptions.hpp"
 
 int main(int argc, char* argv[]) {
   std::string nombre_fichero(argv[1]), primera_linea;
@@ -31,9 +32,7 @@ int main(int argc, char* argv[]) {
       break;
     }
     default:
-      std::cerr << "La base " << base
-                << " no es compatible con el tipo de dato BigInt" << std::endl;
-      exit(1);
+      throw(BigIntBaseNotImplemented("La base " + std::to_string(base) + " no es compatible con el tipo de dato BigInt\n"));
       break;
   }
 }
