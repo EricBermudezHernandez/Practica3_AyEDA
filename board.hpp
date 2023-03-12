@@ -67,12 +67,6 @@ void Board::Start() {
       // Eliminamos la coma (',') que está al final de la base ej: "2," y lo almacenamos en la variable "base" de tipo size_t
       palabra.erase((palabra.size() - 1), 1);
       base = std::stoul(palabra);
-      // Excepción de si la base es incorrecta 
-      try {
-
-      } catch(BigIntBaseNotImplemented excepcion) {
-        std::cerr << excepcion.what() << '\n';
-      }
     }
     while (linea_stream >> palabra) {  // Se itera sobre las palabras restantes de la línea
       if (variables_.find(palabra) != variables_.end()) {  // Si la palabra es una variable ya definida, se
@@ -106,12 +100,6 @@ void Board::Start() {
         pila.push(resultado);
       } else if (palabra == "/") {
         operando_2 = pila.top();
-        // Excepción de si se realiza una división por 0
-        try {
-
-        } catch(BigIntDivisionByZero excepcion) {
-          std::cerr << excepcion.what() << '\n';
-        }
         pila.pop();
         operando_1 = pila.top();
         pila.pop();
@@ -135,12 +123,6 @@ void Board::Start() {
         resultado = operando_1->pow(operando_2);
         pila.push(resultado);
       } else {
-        // Excepción de si hay algún dígito erróneo
-        try {
-
-        } catch(BigIntDivisionByZero excepcion) {
-          std::cerr << excepcion.what() << '\n';
-        }
         Number* numero = Number::create(base, palabra);
         pila.push(numero);
       }
