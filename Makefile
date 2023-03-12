@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-g -std=c++17
 FILENAME=bigint
 
-all: prueba.cc number.o BigInt2.o
+all: main.cc number.o BigInt2.o
 	$(CC) $(CLFAGS) -o $(FILENAME) main.cc BigInt2.o number.o
 
 BigInt2.o: big_int.hpp BigInt2.cc
