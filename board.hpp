@@ -54,9 +54,10 @@ void Board::Start() {
   fichero_salida.open("fichero_salida.txt",
                       std::ios::out);  // Se abre el archivo de salida
   while (!fichero_.eof()) {  // Se itera sobre las líneas del fichero
+    
     std::getline(fichero_, linea);
     linea_stream.str(linea);  // Se establece la línea actual como entrada para el flujo
-    linea_stream >> palabra;  // Se lee la primera palabra de la línea
+    linea_stream >> palabra;  // Se lee el identificador de la variable
     identificador = palabra;  // Se guarda la primera palabra como identificador
                               // de la variable
     linea_stream >> palabra;  // Se lee la siguiente palabra, esto sería el "igual" (=)
@@ -66,11 +67,16 @@ void Board::Start() {
       // Eliminamos la coma (',') que está al final de la base ej: "2," y lo almacenamos en la variable "base" de tipo size_t
       palabra.erase((palabra.size() - 1), 1);
       base = std::stoul(palabra);
+      // Excepción de si la base es incorrecta 
+      try {
+
+      } catch(BigIntBaseNotImplemented excepcion) {
+        std::cerr << excepcion.what() << '\n';
+      }
     }
     while (linea_stream >> palabra) {  // Se itera sobre las palabras restantes de la línea
       if (variables_.find(palabra) != variables_.end()) {  // Si la palabra es una variable ya definida, se
                                                           // apila su valor en la pila
-        std::cout << variables_[palabra] << std::endl;
         pila.push(variables_[palabra]);
       } else if (palabra == "+") {  // Si la palabra es un operador de suma, se
                                     // sacan dos elementos de la pila, se suman,
@@ -100,6 +106,12 @@ void Board::Start() {
         pila.push(resultado);
       } else if (palabra == "/") {
         operando_2 = pila.top();
+        // Excepción de si se realiza una división por 0
+        try {
+
+        } catch(BigIntDivisionByZero excepcion) {
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
         operando_1 = pila.top();
         pila.pop();
@@ -114,7 +126,21 @@ void Board::Start() {
         Number* resultado = Number::create(operando_1->GetBase() , "0");
         resultado = operando_1->module(operando_2);
         pila.push(resultado);
+      } else if (palabra == "^") {
+        operando_2 = pila.top();
+        pila.pop();
+        operando_1 = pila.top();
+        pila.pop();
+        Number* resultado = Number::create(operando_1->GetBase() , "0");
+        resultado = operando_1->pow(operando_2);
+        pila.push(resultado);
       } else {
+        // Excepción de si hay algún dígito erróneo
+        try {
+
+        } catch(BigIntDivisionByZero excepcion) {
+          std::cerr << excepcion.what() << '\n';
+        }
         Number* numero = Number::create(base, palabra);
         pila.push(numero);
       }
@@ -126,7 +152,7 @@ void Board::Start() {
   // Generamos el fichero salida iterarando en el Board para guardar los valores
   auto it = variables_.begin();
   while (it != variables_.end()) {
-    fichero_salida << it->first << " = " << it->second << '\n';
+    fichero_salida << it->first << " = " << it->second->GetBase() << ", " <<*it->second << '\n';
     it++;
   }
 }
