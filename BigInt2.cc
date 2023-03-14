@@ -1,6 +1,5 @@
 #include "big_int.hpp"
 
-
 // =============== CONSTRUCTORES ===============
 
 BigInt<2>::BigInt(long long n) {
@@ -8,19 +7,33 @@ BigInt<2>::BigInt(long long n) {
   while (n > 9) {
     resto = n % 10;
     n /= 10;
+    if (resto >= 2) {
+      throw(BigIntBadDigit("El dígito " + std::to_string(resto) +
+                           " no es un dígito binario\n"));
+    }
     numero_.emplace_back(resto);
+  }
+  if (n >= 2) {
+    throw(BigIntBadDigit("El dígito " + std::to_string(n) +
+                           " no es un dígito binario\n"));
   }
   numero_.emplace_back(n);
 }
 
 BigInt<2>::BigInt(const std::string& numero_binario) {
   for (unsigned long i{numero_binario.size() - 1}; i != -1; --i) {
+    if (numero_binario[i] - '0' >= 2) {
+      throw(BigIntBadDigit("Ha introducido un número no binario\n"));
+    }
     numero_.emplace_back(numero_binario[i] - '0');
   }
 }
 
 BigInt<2>::BigInt(const char* numero_binario) {
   while (*numero_binario != '\0') {
+    if (*numero_binario - '0' >= 2) {
+      throw(BigIntBadDigit("Ha introducido un número no binario\n"));
+    }
     numero_.emplace_back((*numero_binario++ - '0'));
   }
   // Le damos la vuelta para guardarlo al revés
@@ -176,7 +189,7 @@ BigInt<2> operator+(const BigInt<2>& numero1, const BigInt<2>& numero2) {
     // Al estar los números en C2, si un número empieza en 1 es que es negativo,
     // pudiendo dar error al convertirse en otra base, ya que se tomaría como un
     // número negativo Por lo que, añadimos un 0 que no cambia el valor de el
-    // número y lo "vuelve postivo"
+    // número y lo "vuelve positivo"
     result.numero_.push_back(0);
   }
 
