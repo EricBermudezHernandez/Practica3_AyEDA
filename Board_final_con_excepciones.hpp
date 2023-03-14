@@ -83,6 +83,7 @@ void Board::Start() {
       } else if (palabra == "+") {  // Si la palabra es un operador de suma, se
                                     // sacan dos elementos de la pila, se suman,
                                     // y se apila el resultado
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
         try {
           operando_2 = pila.top();
         } catch(BigIntBadDigit excepcion) {
@@ -91,64 +92,137 @@ void Board::Start() {
           std::cerr << excepcion.what() << '\n';
         }
         pila.pop();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
         try {
           operando_1 = pila.top();
         } catch(BigIntBadDigit excepcion) {
           Number* numero_base_no_implementada = Number::create(10, "0");
           pila.push(numero_base_no_implementada);
           std::cerr << excepcion.what() << '\n';
-        };
+        }
         pila.pop();
         Number* resultado = Number::create(operando_1->GetBase() , "0");  
-        resultado = operando_1->add(operando_2);
+        resultado = operando_1->add(operando_2); // Realizamos la operación
         pila.push(resultado);
       } else if (palabra == "-") {  // Lo mismo para los otros operadores aritméticos
-        operando_2 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_2 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
-        operando_1 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_1 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
         Number* resultado = Number::create(operando_1->GetBase() , "0");
-        resultado = operando_1->subtract(operando_2);
+        resultado = operando_1->subtract(operando_2); // Realizamos la operación
         pila.push(resultado);
       } else if (palabra == "*") {
-        operando_2 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_2 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
-        operando_1 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_1 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
         Number* resultado = Number::create(operando_1->GetBase() , "0");
-        resultado = operando_1->multiply(operando_2);
+        resultado = operando_1->multiply(operando_2); // Realizamos la operación
         pila.push(resultado);
       } else if (palabra == "/") {
-        operando_2 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_2 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
-        operando_1 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_1 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
         Number* resultado = Number::create(operando_1->GetBase() , "0");
+        // Excepción que comprueba si se realiza un división por 0
         try {
-          resultado = operando_1->divide(operando_2);
-        } catch(BigIntDivisionByZero excepcion) {
+          resultado = operando_1->divide(operando_2); // Realizamos la operación
+        } catch(BigIntDivisionByZero excepcion) { 
           std::cerr << excepcion.what() << '\n';
         }
         pila.push(resultado);
       } else if (palabra == "%") {
-        operando_2 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_2 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
-        operando_1 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_1 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
         Number* resultado = Number::create(operando_1->GetBase() , "0");
+        // Excepción que comprueba si se realiza un división por 0
         try {
-          resultado = operando_1->module(operando_2);
+          resultado = operando_1->module(operando_2); // Realizamos la operación
         } catch(BigIntDivisionByZero excepcion) {
           std::cerr << excepcion.what() << '\n';
         }
         pila.push(resultado);
       } else if (palabra == "^") {
-        operando_2 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_2 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
-        operando_1 = pila.top();
+        // Excepción que comprueba si se ha introducido un dígito incorrecto
+        try {
+          operando_1 = pila.top();
+        } catch(BigIntBadDigit excepcion) {
+          Number* numero_base_no_implementada = Number::create(10, "0");
+          pila.push(numero_base_no_implementada);
+          std::cerr << excepcion.what() << '\n';
+        }
         pila.pop();
         Number* resultado = Number::create(operando_1->GetBase() , "0");
-        resultado = operando_1->pow(operando_2);
+        resultado = operando_1->pow(operando_2); // Realizamos la operación
         pila.push(resultado);
       } else {
         // Excepción de si hay algún dígito erróneo
