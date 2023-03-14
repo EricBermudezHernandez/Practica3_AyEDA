@@ -177,12 +177,17 @@ BigInt<Base>::BigInt(long long n) {
   while (n > 9) {
     resto = n % 10;
     n /= 10;
-    if (resto > Base) {
+    if (resto >= Base) {
       throw(BigIntBadDigit("El dígito " + std::to_string(resto) +
                            " no es compatible con la base " +
                            std::to_string(Base) + '\n'));
     }
     numero_.emplace_back(resto);
+  }
+  if (n >= Base) {
+      throw(BigIntBadDigit("El dígito " + std::to_string(n) +
+                           " no es compatible con la base " +
+                           std::to_string(Base) + '\n'));
   }
   numero_.emplace_back(n);
 }
@@ -234,11 +239,14 @@ BigInt<Base>::BigInt(const std::string& numero_string) {
       } else {  // En caso de no ser ninguna de las letras hexadecimales, el
                 // usuario nos habrá metido una incorrecta por lo que indicamos
                 // el error
-        throw(BigIntBadDigit("La letra " + numero_string[i] +
-                           " no es compatible con la base hexadecimal\n"));
+        throw(BigIntBadDigit("Ha introducido una letra que no es compatible con la base hexadecimal\n"));
       }
     } else {  // Si no es ninguna letra, es que es un número, por lo que lo
-              // metemos directamente
+              // metemos comprobando si es correcto el dígito
+      if (numero_string[i] - '0' >= Base) {
+      throw(BigIntBadDigit("Ha introducido un dígito que no es compatible con la base " +
+                           std::to_string(Base) + '\n'));
+      }
       numero_.emplace_back(
           numero_string[i] -
           '0');  // Le restamos '0' para convertirlo en un entero
@@ -287,11 +295,15 @@ BigInt<Base>::BigInt(const char* numero) {
             break;
         }
       } else {
-        throw(BigIntBadDigit("La letra " + numero_string[i] +
-                           " no es compatible con la base hexadecimal\n"));
+        throw(BigIntBadDigit("Ha introducido una letra que no es compatible con la base hexadecimal\n"));
       }
     } else {  // Si no es ninguna letra, es que es un número, por lo que lo
-              // metemos directamente
+              // metemos comprobando si es correcto el dígito
+      if ((*numero - '0') >= Base) {
+        std::cout << *numero - '0' << std::endl;
+      throw(BigIntBadDigit("Ha introducido un dígito que no es compatible con la base " +
+                           std::to_string(Base) + '\n'));
+      }
       vector_aux.emplace_back(
           (*numero++) - '0');  // Le restamos '0' para convertirlo en un entero
     }
@@ -678,8 +690,7 @@ BigInt<Base> BigInt<Base>::operator%(const BigInt<Base>& numero2) const {
   // caso es "numero2", es 0. Una división por 0 no es posible, por lo que lo
   // indicamos y salimos del programa
   if (numero2.numero_.size() == 1 && numero2.numero_[0] == 0) {
-    std::cout << "No es posible realizar una división por 0" << std::endl;
-    exit(1);
+    throw(BigIntDivisionByZero("No es posible realizar una división por 0\n"));
   }
 
   // Verificar si el dividendo(numero1) es menor que el divisor(numero2), si
@@ -881,7 +892,6 @@ BigInt<Base>::operator BigInt<2ULL>() const {
     // Para pasar de hexadecimal a binario, si lo hicieramos a papel miraríamos
     // cada dígito a hexadecimal y lo sustituiriamos por su equivalente en
     // binario, en este caso con 4 bits, y lo iríamos añadiendo al final de el
-    // número
     BigInt<Base> aux{*this};
     std::string resultado{
         ""};  // auxiliar que nos permite ir guardando el número en binario
@@ -949,7 +959,7 @@ BigInt<Base>::operator BigInt<2ULL>() const {
           break;
         }
         default: {
-          resultado += {"00000"};
+          resultado += {"0000"};
           break;
         }
       }
