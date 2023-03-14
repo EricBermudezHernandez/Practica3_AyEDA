@@ -31,6 +31,7 @@ class Number {
   virtual operator BigInt<16>() const = 0;
   // Método para crear
   static Number* create(size_t base, const std::string& s);
+  virtual int GetBase() const = 0;
  protected:
   // Métodos protegidos para realizar la lectura y escritura de datos de tipo Number
   virtual std::ostream& write(std::ostream&) const = 0;
@@ -38,7 +39,6 @@ class Number {
   friend std::ostream& operator<<(std::ostream& os, const Number& n);
   friend std::istream& operator>>(std::istream&, Number&);
   // Método para obtener la base de un BigInt y poder hacer las operaciones de manera más sencilla
-  virtual int GetBase() const = 0;
 };
 
 #endif
